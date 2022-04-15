@@ -16,6 +16,8 @@ protected:
 	int DataCount;
 	int Eff;
 public:
+	TTable();
+
 	virtual bool Find(TKey key) = 0;
 	virtual bool Insert(TRecord tr) = 0;
 	virtual bool Delete(TKey key) = 0;
@@ -39,3 +41,27 @@ public:
 		return os;
 	}
 };
+
+inline TTable::TTable() {
+	DataCount = Eff = 0;
+}
+
+inline const int TTable::GetDataCount()
+{
+	return DataCount;
+}
+
+inline const int TTable::GetEff()
+{
+	return Eff;
+}
+
+inline void TTable::ClearEff()
+{
+	Eff = 0;
+}
+
+inline bool TTable::IsEmpty()
+{
+	return DataCount == 0;
+}
