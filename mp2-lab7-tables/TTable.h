@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
-#include <ostream>
-
+#include <iostream>
 
 typedef int TKey;
 typedef std::string TValue;
@@ -9,6 +8,30 @@ typedef std::string TValue;
 struct TRecord {
 	TKey key;
 	TValue val;
+
+	bool operator==(const TRecord& other) const {
+		return (key == other.key);
+	}
+
+	bool operator!=(const TRecord& other) const {
+		return (key != other.key);
+	}
+
+	bool operator>(const TRecord& other) const {
+		return (key > other.key);
+	}
+
+	bool operator<(const TRecord& other) const {
+		return (key < other.key);
+	}
+
+	bool operator>=(const TRecord& other) const {
+		return (key >= other.key);
+	}
+
+	bool operator<=(const TRecord& other) const {
+		return key <= other.key;
+	}
 };
 
 class TTable {
@@ -17,51 +40,53 @@ protected:
 	int Eff;
 public:
 	TTable();
+	virtual ~TTable() {};
+
+	int GetDataCount() const;
+	int GetEff() const;
+
+	void ClearEff();
+
+	bool IsEmpty();
+	virtual bool IsFull() const = 0;
 
 	virtual bool Find(TKey key) = 0;
-	virtual bool Insert(TRecord tr) = 0;
+	virtual bool Insert(TRecord rec) = 0;
 	virtual bool Delete(TKey key) = 0;
-
-	virtual bool ISFull() const = 0;
-	virtual TKey GetKey() = 0;
-	virtual TValue GetValue() = 0;
 
 	virtual void Reset() = 0;
 	virtual void GoNext() = 0;
 	virtual bool IsEnd() = 0;
 
-	const int GetDataCount();
-	const int GetEff();
-	void ClearEff();
-	bool IsEmpty();
+	virtual TKey GetCurrentKey() const = 0;
+	virtual TValue GetCurrentValue() const = 0;
 
-	friend std::ostream& operator<<(std::ostream& os, TTable& tt) {
-		for (tt.Reset(); !tt.IsEnd(); tt.GoNext())
-			os << tt.GetKey();
+	friend std::ostream& operator<<(std::ostream& os, TTable& t) {
+		for (t.Reset(); !t.IsEnd(); t.GoNext()) {
+			os << t.GetCurrentKey() << " " << t.GetCurrentValue();
+		}
 		return os;
 	}
 };
 
-inline TTable::TTable() {
+TTable::TTable() {
 	DataCount = Eff = 0;
 }
 
-inline const int TTable::GetDataCount()
-{
+TTable::~TTable() { }
+
+int TTable::GetDataCount() const {
 	return DataCount;
 }
 
-inline const int TTable::GetEff()
-{
+int TTable::GetEff() const {
 	return Eff;
 }
 
-inline void TTable::ClearEff()
-{
+void TTable::ClearEff() {
 	Eff = 0;
 }
 
-inline bool TTable::IsEmpty()
-{
+bool TTable::IsEmpty() {
 	return DataCount == 0;
 }

@@ -1,15 +1,16 @@
 #pragma once
 #include "TTable.h"
 
-class TArrayTable : TTable {
+class TArrayTable : public TTable {
 protected:
 	TRecord* arr;
-	int size;
-	int cur;
+	int size, cur;
 public:
 	TArrayTable(int _size = 10);
+	~TArrayTable();
 
-	bool ISFull() const;
+	bool IsFull();
+
 	TKey GetKey();
 	TValue GetValue();
 
@@ -18,39 +19,36 @@ public:
 	bool IsEnd();
 };
 
-inline TArrayTable::TArrayTable(int _size)
-{
-	arr = new TRecord[_size];
+TArrayTable::TArrayTable(int _size) {
 	size = _size;
+	arr = new TRecord[size];
 	cur = -1;
 }
 
-inline bool TArrayTable::ISFull() const
-{
-	return (DataCount == size);
+TArrayTable::~TArrayTable() {
+	delete[] arr;
 }
 
-inline TKey TArrayTable::GetKey()
-{
+bool TArrayTable::IsFull() {
+	return DataCount == size;
+}
+
+TKey TArrayTable::GetKey() {
 	return arr[cur].key;
 }
 
-inline TValue TArrayTable::GetValue()
-{
+TValue TArrayTable::GetValue() {
 	return arr[cur].val;
 }
 
-inline void TArrayTable::Reset()
-{
+void TArrayTable::Reset() {
 	cur = 0;
 }
 
-inline void TArrayTable::GoNext()
-{
+void TArrayTable::GoNext() {
 	cur++;
 }
 
-inline bool TArrayTable::IsEnd()
-{
+bool TArrayTable::IsEnd() {
 	return cur == DataCount;
 }
