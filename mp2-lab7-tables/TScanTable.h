@@ -8,6 +8,8 @@ public:
 	bool Find(TKey key);
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
+
+	int GetSize();
 };
 
 inline bool TScanTable::Find(TKey key)
@@ -48,4 +50,9 @@ inline bool TScanTable::Delete(TKey key)
 	DataCount--;
 	Eff++;
 	return true;
+}
+
+inline int TScanTable::GetSize()
+{
+	return size;
 }

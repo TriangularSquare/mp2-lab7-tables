@@ -1,13 +1,20 @@
 #pragma once
+#include <iostream>
 #include "TScanTable.h"
 
 class TSortTable : public TScanTable {
 public:
 	TSortTable(int _size = 10) : TScanTable(_size) {};
+	
+	TSortTable(const TScanTable& st) : TScanTable(GetSize()) { //maybe incorrect
+
+	}
 
 	bool Find(TKey key);
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
+
+	void Sort(int first, int last);
 };
 
 inline bool TSortTable::Find(TKey key) {
@@ -62,4 +69,32 @@ bool TSortTable::Delete(TKey key) {
 	DataCount--;
 	Eff++;
 	return true;
+}
+
+inline void TSortTable::Sort(int first, int last) {
+	TRecord mid = arr[(first + last) / 2];
+	int begin = first;
+	int end = last;
+
+	while (begin < end) {
+		while (arr[begin] < mid) {
+			begin++;
+			Eff++;
+		}
+		while (arr[end] > mid) {
+			end--;
+			Eff++;
+		}
+		if (begin < end) {
+			std::swap(arr[begin], arr[end]);
+			begin++;
+			end--;
+			Eff++;
+		}
+	}
+
+	if (first < end)
+		Sort(first, end);
+	if (begin < last)
+		Sort(begin, last);
 }
