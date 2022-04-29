@@ -140,6 +140,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TArrayHash.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TArrayHash.h" />

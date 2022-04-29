@@ -4,20 +4,23 @@
 class TArrayHash : public THashTable {
 protected:
 	TRecord free;
+	TRecord del;
+
 	TRecord* arr;
+
 	int size;
 	int step;
+
+	int curr;
 public:
 	TArrayHash(int _size = 10, int _step = 1);
+
+	bool Find(TKey key);
+
+	bool Insert(TRecord trec);
+	bool Delete(TKey key);
+
+	void Reset();
+	void GoNext();
+	bool IsEnd();
 };
-
-inline TArrayHash::TArrayHash(int _size = 10, int _step = 1) {
-	size = _size;
-	step = _step;
-	arr = new TRecord[size];
-
-	free.key = -1;
-
-	for (int i = 0; i < size; i++)
-		arr[i] = free;
-}

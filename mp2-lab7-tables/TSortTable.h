@@ -6,8 +6,14 @@ class TSortTable : public TScanTable {
 public:
 	TSortTable(int _size = 10) : TScanTable(_size) {};
 	
-	TSortTable(const TScanTable& st) : TScanTable(GetSize()) { //maybe incorrect
+	TSortTable(TScanTable& st) : TScanTable(st.GetSize()) {
+		int i;
+		for (i = 0, st.Reset(); i < DataCount && !st.IsEnd(); i++, st.GoNext()) {
+			arr[i].key = st.GetCurrentKey();
+			arr[i].val = st.GetCurrentValue();
+		}
 
+		Sort(0, DataCount - 1);
 	}
 
 	bool Find(TKey key);
