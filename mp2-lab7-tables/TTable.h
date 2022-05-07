@@ -69,24 +69,24 @@ public:
 	}
 };
 
-TTable::TTable() {
+inline TTable::TTable() {
 	DataCount = Eff = 0;
 }
 
-TTable::~TTable() { }
+inline TTable::~TTable() { }
 
-int TTable::GetDataCount() const {
+inline int TTable::GetDataCount() const {
 	return DataCount;
 }
 
-int TTable::GetEff() const {
+inline int TTable::GetEff() const {
 	return Eff;
 }
 
-void TTable::ClearEff() {
+inline void TTable::ClearEff() {
 	Eff = 0;
 }
 
-bool TTable::IsEmpty() {
+inline bool TTable::IsEmpty() {
 	return DataCount == 0;
 }

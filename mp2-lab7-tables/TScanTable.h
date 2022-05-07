@@ -3,14 +3,14 @@
 
 class TScanTable : public TArrayTable {
 public:
-	TScanTable(int _size = 10) : TArrayTable(_size) { };
+	TScanTable(int _size = 10);
 
 	bool Find(TKey key);
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
-
-	int GetSize();
 };
+
+inline TScanTable::TScanTable(int _size) : TArrayTable(_size) { }
 
 inline bool TScanTable::Find(TKey key)
 {
@@ -50,9 +50,4 @@ inline bool TScanTable::Delete(TKey key)
 	DataCount--;
 	Eff++;
 	return true;
-}
-
-inline int TScanTable::GetSize()
-{
-	return size;
 }

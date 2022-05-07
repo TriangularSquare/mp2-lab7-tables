@@ -4,24 +4,30 @@
 
 class TSortTable : public TScanTable {
 public:
-	TSortTable(int _size = 10) : TScanTable(_size) {};
+	TSortTable(int _size = 10);
 	
-	TSortTable(TScanTable& st) : TScanTable(st.GetSize()) {
-		int i;
-		for (i = 0, st.Reset(); i < DataCount && !st.IsEnd(); i++, st.GoNext()) {
-			arr[i].key = st.GetCurrentKey();
-			arr[i].val = st.GetCurrentValue();
-		}
-
-		Sort(0, DataCount - 1);
-	}
+	TSortTable(TScanTable& st);
 
 	bool Find(TKey key);
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
 
-	void Sort(int first, int last);
+	void QuickSort(int first, int last);
+	void SelectionSort();
+	void Sort(int flag = 0);
 };
+
+inline TSortTable::TSortTable(int _size) : TScanTable(_size) {}
+
+inline TSortTable::TSortTable(TScanTable& st) : TScanTable(st.GetSize()) {
+	int i;
+	for (i = 0, st.Reset(); i < DataCount && !st.IsEnd(); i++, st.GoNext()) {
+		arr[i].key = st.GetCurrentKey();
+		arr[i].val = st.GetCurrentValue();
+	}
+
+	Sort();
+}
 
 inline bool TSortTable::Find(TKey key) {
 	int begin = 0, end = DataCount - 1, mid;
@@ -77,7 +83,7 @@ bool TSortTable::Delete(TKey key) {
 	return true;
 }
 
-inline void TSortTable::Sort(int first, int last) {
+inline void TSortTable::QuickSort(int first, int last) {
 	TRecord mid = arr[(first + last) / 2];
 	int begin = first;
 	int end = last;
@@ -100,7 +106,37 @@ inline void TSortTable::Sort(int first, int last) {
 	}
 
 	if (first < end)
-		Sort(first, end);
+		QuickSort(first, end);
 	if (begin < last)
-		Sort(begin, last);
+		QuickSort(begin, last);
+}
+
+inline void TSortTable::SelectionSort()
+{
+	int pos;
+
+	for (int i = 0; i < DataCount; i++)
+	{
+		pos = i;
+		
+		for (int j = i; j < DataCount; j++)
+		{
+			Eff++;
+			if (arr[j].key < arr[pos].key)
+				pos = j;
+		}
+		
+		std::swap(arr[pos], arr[i]);
+		Eff++;
+	}
+}
+
+inline void TSortTable::Sort(int flag)
+{
+	if (flag) {
+		SelectionSort();
+	}
+	else {
+		QuickSort(0, DataCount - 1);
+	}
 }

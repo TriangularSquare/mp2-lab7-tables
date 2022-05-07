@@ -9,46 +9,52 @@ public:
 	TArrayTable(int _size = 10);
 	~TArrayTable();
 
+	int GetSize();
 	bool IsFull();
 
-	TKey GetKey();
-	TValue GetValue();
+	TKey GetCurrentKey();
+	TValue GetCurrentValue();
 
 	void Reset();
 	void GoNext();
 	bool IsEnd();
 };
 
-TArrayTable::TArrayTable(int _size) {
+inline TArrayTable::TArrayTable(int _size) {
 	size = _size;
 	arr = new TRecord[size];
 	cur = -1;
 }
 
-TArrayTable::~TArrayTable() {
+inline TArrayTable::~TArrayTable() {
 	delete[] arr;
 }
 
-bool TArrayTable::IsFull() {
+inline int TArrayTable::GetSize()
+{
+	return size;
+}
+
+inline bool TArrayTable::IsFull() {
 	return DataCount == size;
 }
 
-TKey TArrayTable::GetKey() {
+inline TKey TArrayTable::GetCurrentKey() {
 	return arr[cur].key;
 }
 
-TValue TArrayTable::GetValue() {
+inline TValue TArrayTable::GetCurrentValue() {
 	return arr[cur].val;
 }
 
-void TArrayTable::Reset() {
+inline void TArrayTable::Reset() {
 	cur = 0;
 }
 
-void TArrayTable::GoNext() {
+inline void TArrayTable::GoNext() {
 	cur++;
 }
 
-bool TArrayTable::IsEnd() {
+inline bool TArrayTable::IsEnd() {
 	return cur == DataCount;
 }
