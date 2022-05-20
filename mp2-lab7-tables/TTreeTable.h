@@ -28,11 +28,18 @@ protected:
 
 	TStack<TTreeNode*> st;
 
+	int pos;
+	int level;
+
+	void Del(TTreeNode* pDel);
+	void PrintKeys(std::ostream& os, TTreeNode* tn);
+
 public:
 	TTreeTable() : TTable()
 	{
 		pRoot = pPrev = pCurr = nullptr;
 	}
+	~TTreeTable();
 
 	bool IsFull() const;
 
@@ -40,9 +47,46 @@ public:
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
 
+	void Reset();
+	void GoNext();
+	bool IsEnd();
+
 	TKey GetCurrentKey();
 	TValue GetCurrentVal();
+
+	void Print(std::ostream& os);
 };
+
+inline void TTreeTable::Del(TTreeNode* pDel)
+{
+	if (pDel != nullptr) 
+	{
+		Del(pDel->pRight);
+		Del(pDel->pLeft);
+		delete pDel;
+	}
+}
+
+inline void TTreeTable::PrintKeys(std::ostream& os, TTreeNode* tn)
+{
+	if (tn != nullptr)
+	{
+		for (int i = 0; i < level; i++)
+		{
+			os << ' ';
+		}
+		os << tn->rec.key << '/n';
+		level++;
+		PrintKeys(os, tn->pLeft);
+		PrintKeys(os, tn->pRight);
+		level--;
+	}
+}
+
+inline TTreeTable::~TTreeTable()
+{
+	Del(pRoot);
+}
 
 inline bool TTreeTable::IsFull() const
 {
@@ -160,6 +204,51 @@ inline bool TTreeTable::Delete(TKey key)
 	return true;
 }
 
+inline void TTreeTable::Reset()
+{
+	st.Clear();
+	pCurr = pRoot;
+
+	while (pCurr != nullptr)
+	{
+		st.Push(pCurr);
+		pCurr = pCurr->pLeft;
+	}
+
+	if (!st.IsEmpty())
+	{
+		pCurr = st.Top();
+	}
+	pos = 0;
+}
+
+inline void TTreeTable::GoNext()
+{
+	if (pCurr->pRight != nullptr)
+	{
+		pCurr = pCurr->pRight;
+		while (pCurr != nullptr)
+		{
+			st.Push(pCurr);
+			pCurr = pCurr->pLeft;
+		}
+		pCurr = st.Top();
+	}
+	else if (st.IsEmpty())
+	{
+		pCurr = st.Pop()->pRight;
+	}
+	else
+	{
+		pCurr = st.Top();
+	}
+}
+
+inline bool TTreeTable::IsEnd()
+{
+	return pos == DataCount;
+}
+
 inline TKey TTreeTable::GetCurrentKey()
 {
 	return pCurr->rec.key;
@@ -168,4 +257,9 @@ inline TKey TTreeTable::GetCurrentKey()
 inline TValue TTreeTable::GetCurrentVal()
 {
 	return pCurr->rec.val;
+}
+
+inline void TTreeTable::Print(std::ostream& os)
+{
+	PrintKeys(os, pRoot);
 }

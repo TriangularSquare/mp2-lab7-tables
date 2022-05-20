@@ -145,6 +145,7 @@
     <ClInclude Include="Stack.h" />
     <ClInclude Include="TArrayHash.h" />
     <ClInclude Include="TArrayTable.h" />
+    <ClInclude Include="TBalancedTree.h" />
     <ClInclude Include="THashTable.h" />
     <ClInclude Include="TScanTable.h" />
     <ClInclude Include="TSortTable.h" />
