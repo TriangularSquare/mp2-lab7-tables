@@ -4,6 +4,8 @@
 
 struct TTreeNode
 {
+	int Bal;
+
 	TRecord rec;
 	TTreeNode* pLeft, * pRight;
 
