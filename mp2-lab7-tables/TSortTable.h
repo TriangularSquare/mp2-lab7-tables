@@ -2,7 +2,12 @@
 #include <iostream>
 #include "TScanTable.h"
 
+bool sortmode;
+
 class TSortTable : public TScanTable {
+	void QuickSort(int first, int last);
+	void SelectionSort();
+	void Sort();
 public:
 	TSortTable(int _size = 10);
 	
@@ -11,22 +16,20 @@ public:
 	bool Find(TKey key);
 	bool Insert(TRecord rec);
 	bool Delete(TKey key);
-
-	void QuickSort(int first, int last);
-	void SelectionSort();
-	void Sort(int flag = 0);
 };
 
 inline TSortTable::TSortTable(int _size) : TScanTable(_size) {}
 
 inline TSortTable::TSortTable(TScanTable& st) : TScanTable(st.GetSize()) {
+	DataCount = st.GetDataCount();
 	int i;
-	for (i = 0, st.Reset(); i < DataCount && !st.IsEnd(); i++, st.GoNext()) {
-		arr[i].key = st.GetCurrentKey();
-		arr[i].val = st.GetCurrentValue();
+	for (i = 0, st.Reset(); !st.IsEnd(); st.GoNext(), i++)
+	{
+		arr[i] = TRecord(st.GetCurrentKey(), st.GetCurrentValue());
+		Eff++;
 	}
-
 	Sort();
+
 }
 
 inline bool TSortTable::Find(TKey key) {
@@ -38,14 +41,14 @@ inline bool TSortTable::Find(TKey key) {
 			end = mid - 1;
 		}
 		else if (key > arr[mid].key) {
-			begin = end + 1;
+			begin = mid + 1;
 		}
 		else {
-			cur = mid;
+			curr = mid;
 			return true;
 		}
 	}
-	cur = begin;
+	curr = begin;
 	return false;
 }
 
@@ -57,12 +60,12 @@ bool TSortTable::Insert(TRecord rec) {
 		return false;
 	}
 
-	for (int i = DataCount - 1; i >= cur; i--) {
+	for (int i = DataCount - 1; i >= curr; i--) {
 		arr[i + 1] = arr[i];
 		Eff++;
 	}
 
-	arr[cur] = rec;
+	arr[curr] = rec;
 	DataCount++;
 	Eff++;
 	return true;
@@ -73,7 +76,7 @@ bool TSortTable::Delete(TKey key) {
 		return false;
 	}
 
-	for (int i = cur; i < DataCount - 1; i++) {
+	for (int i = curr; i < DataCount - 1; i++) {
 		arr[i] = arr[i + 1];
 		Eff++;
 	}
@@ -84,31 +87,35 @@ bool TSortTable::Delete(TKey key) {
 }
 
 inline void TSortTable::QuickSort(int first, int last) {
-	TRecord mid = arr[(first + last) / 2];
-	int begin = first;
-	int end = last;
+	TKey midKey = arr[(first + last) / 2].key;
 
-	while (begin < end) {
-		while (arr[begin] < mid) {
-			begin++;
+	int f = first, l = last;
+	while (f < l)
+	{
+		while (arr[f].key < midKey)
+		{
+			f++;
 			Eff++;
 		}
-		while (arr[end] > mid) {
-			end--;
+		while (arr[l].key > midKey)
+		{
+			l--;
 			Eff++;
 		}
-		if (begin < end) {
-			std::swap(arr[begin], arr[end]);
-			begin++;
-			end--;
+
+		if (f <= l)
+		{
+			std::swap(arr[f], arr[l]);
+			f++; l--;
 			Eff++;
 		}
 	}
 
-	if (first < end)
-		QuickSort(first, end);
-	if (begin < last)
-		QuickSort(begin, last);
+	if (first < l)
+		QuickSort(first, l);
+	if (last > f)
+		QuickSort(f, last);
+
 }
 
 inline void TSortTable::SelectionSort()
@@ -118,22 +125,22 @@ inline void TSortTable::SelectionSort()
 	for (int i = 0; i < DataCount; i++)
 	{
 		pos = i;
-		
+
 		for (int j = i; j < DataCount; j++)
 		{
 			Eff++;
 			if (arr[j].key < arr[pos].key)
 				pos = j;
 		}
-		
+
 		std::swap(arr[pos], arr[i]);
 		Eff++;
 	}
 }
 
-inline void TSortTable::Sort(int flag)
+inline void TSortTable::Sort()
 {
-	if (flag) {
+	if (sortmode) {
 		SelectionSort();
 	}
 	else {

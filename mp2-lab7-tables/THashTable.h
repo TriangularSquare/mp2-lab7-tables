@@ -3,7 +3,7 @@
 
 class THashTable : public TTable {
 protected:
-	virtual int HashFunc(TKey key) {
+	virtual int HashFunc(TKey key) const {
 		return key;
 	}
 };

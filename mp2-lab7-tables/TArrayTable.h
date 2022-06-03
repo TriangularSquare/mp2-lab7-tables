@@ -4,57 +4,65 @@
 class TArrayTable : public TTable {
 protected:
 	TRecord* arr;
-	int size, cur;
+	int size, curr;
 public:
 	TArrayTable(int _size = 10);
 	~TArrayTable();
 
-	int GetSize();
-	bool IsFull();
+	int GetSize() const;
+	bool IsFull() const override;
 
-	TKey GetCurrentKey();
-	TValue GetCurrentValue();
+	TKey GetCurrentKey() const override;
+	TValue GetCurrentValue() const override;
 
-	void Reset();
-	void GoNext();
-	bool IsEnd();
+	void Reset() override;
+	void GoNext() override;
+	bool IsEnd() override;
 };
 
-inline TArrayTable::TArrayTable(int _size) {
+inline TArrayTable::TArrayTable(int _size) 
+{
 	size = _size;
 	arr = new TRecord[size];
-	cur = -1;
+	curr = -1;
 }
 
-inline TArrayTable::~TArrayTable() {
+inline TArrayTable::~TArrayTable() 
+{
 	delete[] arr;
 }
 
-inline int TArrayTable::GetSize()
+inline int TArrayTable::GetSize() const
 {
 	return size;
 }
 
-inline bool TArrayTable::IsFull() {
+inline bool TArrayTable::IsFull() const
+{
 	return DataCount == size;
 }
 
-inline TKey TArrayTable::GetCurrentKey() {
-	return arr[cur].key;
+inline TKey TArrayTable::GetCurrentKey() const
+{
+	return arr[curr].key;
 }
 
-inline TValue TArrayTable::GetCurrentValue() {
-	return arr[cur].val;
+inline TValue TArrayTable::GetCurrentValue() const
+{
+	return arr[curr].val;
 }
 
-inline void TArrayTable::Reset() {
-	cur = 0;
+inline void TArrayTable::Reset() 
+{
+	curr = 0;
 }
 
-inline void TArrayTable::GoNext() {
-	cur++;
+inline void TArrayTable::GoNext() 
+{
+	curr++;
 }
 
-inline bool TArrayTable::IsEnd() {
-	return cur == DataCount;
+inline bool TArrayTable::IsEnd() 
+{
+	return curr == DataCount;
 }

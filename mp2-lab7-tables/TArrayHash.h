@@ -13,10 +13,10 @@ protected:
 
 	int curr;
 public:
-	TArrayHash(int _size = 10, int _step = 1);
+	TArrayHash(int _size = 10, int _step = 5);
 	~TArrayHash();
 
-	bool IsFull();
+	bool IsFull() const override;
 
 	bool Find(TKey key);
 
@@ -27,11 +27,12 @@ public:
 	void GoNext();
 	bool IsEnd();
 
-	TKey GetCurrentKey();
-	TValue GetCurrentVal();
+	TKey GetCurrentKey() const override;
+	TValue GetCurrentValue() const override;
 };
 
-inline TArrayHash::TArrayHash(int _size = 10, int _step = 1) {
+inline TArrayHash::TArrayHash(int _size, int _step)
+{
 	size = _size;
 	step = _step;
 	arr = new TRecord[size];
@@ -47,7 +48,7 @@ inline TArrayHash::~TArrayHash()
 	delete[] arr;
 }
 
-inline bool TArrayHash::IsFull()
+inline bool TArrayHash::IsFull() const
 {
 	return (DataCount == size);
 }
@@ -126,12 +127,12 @@ inline bool TArrayHash::IsEnd()
 	return curr == size;
 }
 
-inline TKey TArrayHash::GetCurrentKey()
+inline TKey TArrayHash::GetCurrentKey() const
 {
 	return arr[curr].key;
 }
 
-inline TValue TArrayHash::GetCurrentVal()
+inline TValue TArrayHash::GetCurrentValue() const
 {
 	return arr[curr].val;
 }

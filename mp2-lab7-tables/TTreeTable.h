@@ -4,12 +4,16 @@
 
 struct TTreeNode
 {
-	int Bal;
-
 	TRecord rec;
+
 	TTreeNode* pLeft, * pRight;
 
-	TTreeNode(TRecord _rec, TTreeNode* _pLeft = nullptr, TTreeNode* _pRight = nullptr);
+	int Bal;
+
+	TTreeNode(
+		TRecord _rec,
+		TTreeNode* _pLeft = nullptr,
+		TTreeNode* _pRight = nullptr);
 };
 
 TTreeNode::TTreeNode(
@@ -20,77 +24,114 @@ TTreeNode::TTreeNode(
 	rec = _rec;
 	pLeft = _pLeft;
 	pRight = _pRight;
+
+	Bal = 0;
 }
 
 class TTreeTable : public TTable
 {
 protected:
 	TTreeNode* pRoot;
+
 	TTreeNode* pPrev, * pCurr;
 
 	TStack<TTreeNode*> st;
 
 	int pos;
-	int level;
+	void DelRecursively(TTreeNode* pDel);
 
-	void Del(TTreeNode* pDel);
-	void PrintKeys(std::ostream& os, TTreeNode* tn);
+	int level;
+	void PrintRecursively(std::ostream& os, TTreeNode* tmp, bool printBal);
+
+	bool IsBalanced(TTreeNode* node);
+	int Height(TTreeNode* node);
 
 public:
-	TTreeTable() : TTable()
-	{
-		pRoot = pPrev = pCurr = nullptr;
-	}
+	TTreeTable();
 	~TTreeTable();
 
-	bool IsFull() const;
+	bool IsFull() const override;
+	bool Find(TKey key) override;
+	virtual bool Insert(TRecord rec) override;
+	virtual bool Delete(TKey key) override;
 
-	bool Find(TKey key);
-	bool Insert(TRecord rec);
-	bool Delete(TKey key);
+	void Reset() override;
+	void GoNext() override;
+	bool IsEnd() override;
 
-	void Reset();
-	void GoNext();
-	bool IsEnd();
+	bool IsBalanced();
 
-	TKey GetCurrentKey();
-	TValue GetCurrentVal();
+	TKey GetCurrentKey() const override;
+	TValue GetCurrentValue() const override;
 
-	void Print(std::ostream& os);
+	void Print(std::ostream& os = std::cout, bool printBal = false);
 };
 
-inline void TTreeTable::Del(TTreeNode* pDel)
+void TTreeTable::DelRecursively(TTreeNode* pDel)
 {
-	if (pDel != nullptr) 
+	if (pDel != nullptr)
 	{
-		Del(pDel->pRight);
-		Del(pDel->pLeft);
+		DelRecursively(pDel->pRight);
+		DelRecursively(pDel->pLeft);
 		delete pDel;
 	}
 }
 
-inline void TTreeTable::PrintKeys(std::ostream& os, TTreeNode* tn)
+void TTreeTable::PrintRecursively(std::ostream& os, TTreeNode* pNode, bool printBal)
 {
-	if (tn != nullptr)
+	if (pNode != nullptr)
 	{
 		for (int i = 0; i < level; i++)
-		{
-			os << ' ';
-		}
-		os << tn->rec.key << '/n';
+			os << "  ";
+		os << pNode->rec.key;
+		if (printBal)
+			os << " (" << pNode->Bal << ")";
+		os << '\n';
+
 		level++;
-		PrintKeys(os, tn->pLeft);
-		PrintKeys(os, tn->pRight);
+		PrintRecursively(os, pNode->pLeft, printBal);
+		PrintRecursively(os, pNode->pRight, printBal);
 		level--;
 	}
 }
 
-inline TTreeTable::~TTreeTable()
+bool TTreeTable::IsBalanced(TTreeNode* node)
 {
-	Del(pRoot);
+	int lh;
+	int rh;
+
+	if (node == nullptr)
+		return true;
+
+	lh = Height(node->pLeft);
+	rh = Height(node->pRight);
+
+	if (abs(lh - rh) <= 1
+		&& IsBalanced(node->pLeft)
+		&& IsBalanced(node->pRight))
+		return true;
+	return false;
 }
 
-inline bool TTreeTable::IsFull() const
+int TTreeTable::Height(TTreeNode* node)
+{
+	if (node == nullptr) return 0;
+	return 1 + std::max(Height(node->pLeft), Height(node->pRight));
+}
+
+TTreeTable::TTreeTable() : TTable()
+{
+	pRoot = pPrev = pCurr = nullptr;
+	pos = 0;
+	level = 0;
+}
+
+TTreeTable::~TTreeTable()
+{
+	DelRecursively(pRoot);
+}
+
+bool TTreeTable::IsFull() const
 {
 	try
 	{
@@ -104,7 +145,7 @@ inline bool TTreeTable::IsFull() const
 	}
 }
 
-inline bool TTreeTable::Find(TKey key)
+bool TTreeTable::Find(TKey key)
 {
 	pPrev = nullptr;
 	pCurr = pRoot;
@@ -112,13 +153,16 @@ inline bool TTreeTable::Find(TKey key)
 	while (pCurr != nullptr)
 	{
 		Eff++;
+
 		if (pCurr->rec.key == key)
 			return true;
+
 		else if (key > pCurr->rec.key)
 		{
 			pPrev = pCurr;
 			pCurr = pCurr->pRight;
 		}
+
 		else
 		{
 			pPrev = pCurr;
@@ -127,16 +171,19 @@ inline bool TTreeTable::Find(TKey key)
 	}
 
 	pCurr = pPrev;
+	return false;
 }
 
-inline bool TTreeTable::Insert(TRecord rec)
+bool TTreeTable::Insert(TRecord rec)
 {
-	if (IsFull()) throw "Table is already full";
+	if (IsFull()) throw "Can't insert: no more space in table";
 	if (Find(rec.key)) return false;
 
 	TTreeNode* newNode = new TTreeNode(rec);
 
-	if (rec.key > pCurr->rec.key)
+	if (pRoot == nullptr)
+		pRoot = newNode;
+	else if (rec.key > pCurr->rec.key)
 		pCurr->pRight = newNode;
 	else
 		pCurr->pLeft = newNode;
@@ -146,7 +193,7 @@ inline bool TTreeTable::Insert(TRecord rec)
 	return true;
 }
 
-inline bool TTreeTable::Delete(TKey key)
+bool TTreeTable::Delete(TKey key)
 {
 	if (!Find(key)) return false;
 
@@ -155,34 +202,43 @@ inline bool TTreeTable::Delete(TKey key)
 	if (pCurr->pRight == nullptr)
 	{
 		Eff++;
+
 		if (pPrev == nullptr)
 			pRoot = pRoot->pLeft;
+		
 		else
 		{
 			if (pCurr->rec.key > pPrev->rec.key)
 				pPrev->pRight = pCurr->pLeft;
+			
 			else
 				pPrev->pLeft = pCurr->pLeft;
 		}
 	}
+	
 	else if (pCurr->pLeft == nullptr)
 	{
 		Eff++;
+		
 		if (pPrev == nullptr)
 			pRoot = pRoot->pRight;
+
 		else
 		{
 			if (pCurr->rec.key > pPrev->rec.key)
 				pPrev->pRight = pCurr->pRight;
+			
 			else
 				pPrev->pLeft = pCurr->pRight;
 		}
 	}
+
 	else
 	{
 		TTreeNode* tmp = pCurr->pLeft;
-		pPrev = pCurr;
 
+		pPrev = pCurr;
+		
 		while (tmp->pRight != nullptr)
 		{
 			Eff++;
@@ -195,6 +251,7 @@ inline bool TTreeTable::Delete(TKey key)
 
 		if (pPrev != pCurr)
 			pPrev->pRight = tmp->pLeft;
+		
 		else
 			pPrev->pLeft = tmp->pLeft;
 
@@ -206,7 +263,7 @@ inline bool TTreeTable::Delete(TKey key)
 	return true;
 }
 
-inline void TTreeTable::Reset()
+void TTreeTable::Reset()
 {
 	st.Clear();
 	pCurr = pRoot;
@@ -217,18 +274,19 @@ inline void TTreeTable::Reset()
 		pCurr = pCurr->pLeft;
 	}
 
-	if (!st.IsEmpty())
-	{
+	if (!IsEmpty())
 		pCurr = st.Top();
-	}
+
 	pos = 0;
 }
 
-inline void TTreeTable::GoNext()
+void TTreeTable::GoNext()
 {
+	TTreeNode* node = st.Pop();
 	if (pCurr->pRight != nullptr)
 	{
 		pCurr = pCurr->pRight;
+
 		while (pCurr != nullptr)
 		{
 			st.Push(pCurr);
@@ -236,32 +294,36 @@ inline void TTreeTable::GoNext()
 		}
 		pCurr = st.Top();
 	}
-	else if (st.IsEmpty())
-	{
-		pCurr = st.Pop()->pRight;
-	}
 	else
-	{
-		pCurr = st.Top();
-	}
+		if (st.IsEmpty())
+			pCurr = node->pRight;
+		else
+			pCurr = st.Top();
+	pos++;
 }
 
-inline bool TTreeTable::IsEnd()
+bool TTreeTable::IsEnd()
 {
-	return pos == DataCount;
+	return (pos == DataCount);
 }
 
-inline TKey TTreeTable::GetCurrentKey()
+TKey TTreeTable::GetCurrentKey() const
 {
 	return pCurr->rec.key;
 }
 
-inline TValue TTreeTable::GetCurrentVal()
+TValue TTreeTable::GetCurrentValue() const
 {
 	return pCurr->rec.val;
 }
 
-inline void TTreeTable::Print(std::ostream& os)
+void TTreeTable::Print(std::ostream& os, bool printBal)
 {
-	PrintKeys(os, pRoot);
+	PrintRecursively(os, pRoot, printBal);
+	os << "IsBalanced: " << IsBalanced() << '\n';
+}
+
+bool TTreeTable::IsBalanced()
+{
+	return IsBalanced(pRoot);
 }

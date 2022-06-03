@@ -17,11 +17,11 @@ inline bool TScanTable::Find(TKey key)
 	for (int i = 0; i < DataCount; i++) {
 		Eff++;
 		if (arr[i].key == key) {
-			cur = i;
+			curr = i;
 			return true;
 		}
 	}
-	cur = DataCount;
+	curr = DataCount;
 	return false;
 }
 
@@ -34,7 +34,7 @@ inline bool TScanTable::Insert(TRecord rec)
 		return false;
 	}
 
-	arr[cur] = rec;
+	arr[curr] = rec;
 	DataCount++;
 	Eff++;
 	return true;
@@ -46,7 +46,7 @@ inline bool TScanTable::Delete(TKey key)
 		return false;
 	}
 
-	arr[cur] = arr[DataCount - 1];
+	arr[curr] = arr[DataCount - 1];
 	DataCount--;
 	Eff++;
 	return true;
