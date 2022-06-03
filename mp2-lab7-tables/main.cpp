@@ -80,7 +80,7 @@ int main()
 		cin >> entriesCount;
 
 		int keyMax;
-		cout << "Возможный максимальный ключ";
+		cout << "Возможный максимальный ключ: ";
 		cin >> keyMax;
 
 		switch (tableType)
